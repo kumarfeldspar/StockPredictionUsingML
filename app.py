@@ -160,8 +160,8 @@ def analyze_sentiment(titles):
     # Attempt to extract the sentiment score
     # try:
         # Access the text from the response
-    candidates = response.index
-    print(candidates)
+    sentiment_score=response.candidates[0].content.parts[0].text
+    print(sentiment_score)
     # except (KeyError, IndexError, ValueError) as e:
     #     st.error(f"Failed to extract sentiment score: {e}")
     #     sentiment_score = "Error"
@@ -178,9 +178,11 @@ if st.button('Get Market Sentiment'):
         # Fetch news and analyze sentiment
         headlines = get_news_headlines(stock)
         st.write("Latest News Headlines:")  
-        st.write(headlines)
+        # st.write(headlines)
 
         sentiment_score = analyze_sentiment(headlines)
-        st.write(f"Market Sentiment Score: {sentiment_score}")
+        st.write(f"Market Sentiment Score (From 1(worst) to 5(best)) :")
+        ans=str(sentiment_score)
+        st.subheader(ans)
     except Exception as e:
         st.write(f"An error occurred: {e}")
