@@ -3,3 +3,5 @@
 
 # Ignore environment variable files
 .env
+
+.github

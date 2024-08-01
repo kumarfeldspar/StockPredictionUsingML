@@ -10,3 +10,4 @@ python-dotenv
 newsapi-python
 Pillow
 google-generativeai
+tensorflow
