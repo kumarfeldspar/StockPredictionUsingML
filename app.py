@@ -23,7 +23,7 @@ genai.configure(api_key=google_api_key)
 newsapi = NewsApiClient(api_key=newsapi_api_key)
 
 # Streamlit title
-st.title("Stock Price Predictor and Market Sentiment Analysis App")
+st.title("Stock Price Predictor and Market Sentiment Analysis App1")
 
 # User input for stock ID
 stock = st.text_input("Enter the Stock ID", "GOOG")
