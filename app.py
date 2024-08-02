@@ -5,7 +5,7 @@ from keras.models import load_model
 import matplotlib.pyplot as plt
 import yfinance as yf
 from sklearn.preprocessing import MinMaxScaler
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
 from newsapi import NewsApiClient
@@ -106,9 +106,6 @@ plt.plot(pd.concat([google_data.Close[:splitting_len + 100], ploting_data], axis
 plt.legend(["Data- not used", "Original Test data", "Predicted Test data"])
 st.pyplot(fig)
 
-# Function to fetch news headlines
-from datetime import datetime, timedelta
-
 # Define today's date and the date two days ago
 today = datetime.now().strftime('%Y-%m-%d')
 two_days_ago = (datetime.now() - timedelta(days=2)).strftime('%Y-%m-%d')
@@ -129,7 +126,6 @@ def get_news_headlines(company):
         # Extract article titles
         articles = all_articles.get('articles', [])
         titles = [article['title'] for article in articles]
-        # print(titles)
 
         return titles
 
@@ -138,6 +134,7 @@ def get_news_headlines(company):
         return []
 
 # Function to analyze sentiment using Google Generative AI
+
 def analyze_sentiment(titles):
     # Create the prompt with the instructions and the news headlines
     prompt = (
@@ -154,21 +151,13 @@ def analyze_sentiment(titles):
     )._result
 
     # Debugging: Print the entire response to understand its structure
-    print("Full response4354:", response.candidates[0].content.parts[0].text)
-    # print("Full response:", response['candidates'])
+    print("Full response:", response.candidates[0].content.parts[0].text)
 
-    # Attempt to extract the sentiment score
-    # try:
-        # Access the text from the response
-    sentiment_score=response.candidates[0].content.parts[0].text
-    print(sentiment_score)
-    # except (KeyError, IndexError, ValueError) as e:
-    #     st.error(f"Failed to extract sentiment score: {e}")
-    #     sentiment_score = "Error"
+    # Attempt to extract and clean the sentiment score
+    sentiment_score = response.candidates[0].content.parts[0].text.strip()
+    print("Cleaned sentiment score:", sentiment_score)
 
     return sentiment_score
-
-
 
 # Display market sentiment analysis
 st.subheader("Market Sentiment Analysis")
@@ -177,12 +166,28 @@ if st.button('Get Market Sentiment'):
     try:
         # Fetch news and analyze sentiment
         headlines = get_news_headlines(stock)
-        st.write("Latest News Headlines:")  
-        # st.write(headlines)
-
+        
+        # Display latest news headlines in an expandable section
+        with st.expander("Latest News Headlines"):
+            st.write(headlines)
+        
         sentiment_score = analyze_sentiment(headlines)
-        st.write(f"Market Sentiment Score (From 1(worst) to 5(best)) :")
-        ans=str(sentiment_score)
-        st.subheader(ans)
+        
+        # Determine sentiment description based on score
+        if sentiment_score == "1":
+            sentiment_description = "Don't buy"
+        elif sentiment_score == "2":
+            sentiment_description = "Buy at your own risk"
+        elif sentiment_score == "3":
+            sentiment_description = "Average Conditions"
+        elif sentiment_score == "4":
+            sentiment_description = "Favorable conditions"
+        elif sentiment_score == "5":
+            sentiment_description = "Best time to buy"
+        else:
+            sentiment_description = "Invalid score"
+        
+        st.write(f"Market Sentiment Score (From 1(worst) to 5(best)):")
+        st.subheader(f"{sentiment_score} - {sentiment_description}")
     except Exception as e:
         st.write(f"An error occurred: {e}")
